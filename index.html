@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tip Calculator — Fast, Free, Instant</title>
+  <meta name="description" content="Free tip calculator. Instantly calculate restaurant tips, split bills, and choose your tip percentage. No signup required.">
+  <meta name="keywords" content="tip calculator, restaurant tip calculator, bill splitter, tip percentage calculator">
+  <meta property="og:title" content="Tip Calculator — Fast, Free, Instant">
+  <meta property="og:description" content="Calculate tips and split bills in seconds. Free, no signup.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://quicktipcalc.cc">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              400: '#34D399',
+              500: '#10B981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+    }
+
+    /* Animated gradient header */
+    .header-gradient {
+      background: linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%);
+    }
+
+    /* Input focus ring */
+    .input-field {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #10B981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Preset tip buttons */
+    .tip-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: 2px solid #e2e8f0;
+    }
+    .tip-btn:hover {
+      border-color: #10B981;
+      color: #10B981;
+      background: #f0fdf4;
+    }
+    .tip-btn.active {
+      background: #10B981;
+      border-color: #10B981;
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+
+    /* Result card shine effect */
+    .result-card {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.05) 50%,
+        rgba(255,255,255,0) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* Action button */
+    .action-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Number counter animation */
+    .result-value {
+      transition: opacity 0.15s ease;
+    }
+    .result-value.updating {
+      opacity: 0.5;
+    }
+
+    /* Pill badge */
+    .badge {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Subtle card shadow */
+    .card {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    /* Range slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10B981;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.4);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10B981;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(16,185,129,0.4);
+      border: none;
+    }
+
+    /* Affiliate section */
+    .affiliate-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .affiliate-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease forwards;
+    }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <!-- ══════════════════════════════════════════════════════════════
+       ADSENSE PLACEHOLDER — Above the fold
+       Replace the comment below with your actual AdSense unit code.
+       ══════════════════════════════════════════════════════════════
+  <!--
+  <div class="w-full flex justify-center py-2 bg-white border-b border-slate-100">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  -->
+
+  <!-- ══════════ HEADER ══════════ -->
+  <header class="header-gradient text-white py-8 px-4 text-center shadow-lg">
+    <div class="max-w-lg mx-auto">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <span class="text-3xl">💸</span>
+        <h1 class="text-2xl font-bold tracking-tight">Tip Calculator</h1>
+      </div>
+      <p class="text-emerald-100 text-sm font-medium">Fast · Free · Instant · No signup</p>
+    </div>
+  </header>
+
+  <!-- ══════════ MAIN ══════════ -->
+  <main class="max-w-lg mx-auto px-4 py-6 space-y-4 fade-in">
+
+    <!-- ─── Bill Amount ─── -->
+    <section class="bg-white rounded-2xl p-5 card">
+      <label for="bill-amount" class="block text-sm font-semibold text-slate-600 mb-2 uppercase tracking-wide">
+        💳 Bill Amount
+      </label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl font-semibold pointer-events-none">$</span>
+        <input
+          id="bill-amount"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          class="input-field w-full pl-10 pr-4 py-4 text-2xl font-bold text-slate-800 border-2 border-slate-200 rounded-xl bg-slate-50 placeholder-slate-300"
+        >
+      </div>
+    </section>
+
+    <!-- ─── Tip Percentage ─── -->
+    <section class="bg-white rounded-2xl p-5 card">
+      <label class="block text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wide">
+        🎯 Tip Percentage
+      </label>
+      <!-- Preset buttons -->
+      <div class="grid grid-cols-4 gap-2 mb-4">
+        <button class="tip-btn rounded-xl py-3 font-bold text-slate-600 text-lg" data-tip="15">15%</button>
+        <button class="tip-btn rounded-xl py-3 font-bold text-slate-600 text-lg" data-tip="18">18%</button>
+        <button class="tip-btn rounded-xl py-3 font-bold text-slate-600 text-lg active" data-tip="20">20%</button>
+        <button class="tip-btn rounded-xl py-3 font-bold text-slate-600 text-lg" data-tip="25">25%</button>
+      </div>
+      <!-- Custom % input -->
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-slate-500 font-medium whitespace-nowrap">Custom:</span>
+        <div class="relative flex-1">
+          <input
+            id="custom-tip"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            max="100"
+            step="1"
+            placeholder="e.g. 22"
+            class="input-field w-full px-4 py-3 pr-10 text-lg font-semibold text-slate-800 border-2 border-slate-200 rounded-xl bg-slate-50 placeholder-slate-300"
+          >
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold pointer-events-none">%</span>
+        </div>
+      </div>
+      <!-- Slider -->
+      <div class="mt-4">
+        <input type="range" id="tip-slider" min="0" max="50" value="20" step="1">
+        <div class="flex justify-between text-xs text-slate-400 mt-1 px-1">
+          <span>0%</span>
+          <span id="slider-label" class="font-semibold text-emerald-600">20%</span>
+          <span>50%</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Split Bill ─── -->
+    <section class="bg-white rounded-2xl p-5 card">
+      <label class="block text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wide">
+        👥 Split Between
+      </label>
+      <div class="flex items-center gap-4">
+        <button id="people-dec" class="action-btn w-12 h-12 rounded-full border-2 border-slate-200 flex items-center justify-center text-2xl font-bold text-slate-500 hover:border-emerald-400 hover:text-emerald-500">−</button>
+        <div class="flex-1 text-center">
+          <span id="people-count" class="text-4xl font-bold text-slate-800">1</span>
+          <p class="text-sm text-slate-400 mt-1" id="people-label">person</p>
+        </div>
+        <button id="people-inc" class="action-btn w-12 h-12 rounded-full border-2 border-slate-200 flex items-center justify-center text-2xl font-bold text-slate-500 hover:border-emerald-400 hover:text-emerald-500">+</button>
+      </div>
+      <!-- Direct input -->
+      <div class="mt-3">
+        <input
+          id="people-input"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="20"
+          value="1"
+          class="input-field w-full px-4 py-2 text-center text-base border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-600"
+          placeholder="or type number"
+        >
+      </div>
+    </section>
+
+    <!-- ─── Results ─── -->
+    <section class="result-card rounded-2xl p-5 text-white shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-bold text-lg tracking-tight">Results</h2>
+        <span class="badge text-xs px-3 py-1 rounded-full font-medium" id="tip-badge">20% tip</span>
+      </div>
+
+      <!-- Per-person highlight -->
+      <div class="bg-white/15 rounded-xl p-4 mb-4 text-center backdrop-blur-sm">
+        <p class="text-emerald-100 text-sm font-medium mb-1">Total Per Person</p>
+        <p class="result-value text-5xl font-black tracking-tight" id="total-per-person">$0.00</p>
+      </div>
+
+      <!-- Grid of other values -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-white/15 rounded-xl p-3 text-center backdrop-blur-sm">
+          <p class="text-emerald-100 text-xs font-medium mb-1">Tip Amount</p>
+          <p class="result-value text-xl font-bold" id="tip-amount">$0.00</p>
+        </div>
+        <div class="bg-white/15 rounded-xl p-3 text-center backdrop-blur-sm">
+          <p class="text-emerald-100 text-xs font-medium mb-1">Tip / Person</p>
+          <p class="result-value text-xl font-bold" id="tip-per-person">$0.00</p>
+        </div>
+        <div class="bg-white/15 rounded-xl p-3 text-center backdrop-blur-sm">
+          <p class="text-emerald-100 text-xs font-medium mb-1">Total Bill</p>
+          <p class="result-value text-xl font-bold" id="total-bill">$0.00</p>
+        </div>
+      </div>
+
+      <!-- Round Up / Round Down -->
+      <div class="flex gap-3 mt-4">
+        <button id="round-up-btn" class="action-btn flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold py-3 rounded-xl text-sm border border-white/30 backdrop-blur-sm">
+          ⬆️ Round Up
+        </button>
+        <button id="round-down-btn" class="action-btn flex-1 bg-white/20 hover:bg-white/30 text-white font-semibold py-3 rounded-xl text-sm border border-white/30 backdrop-blur-sm">
+          ⬇️ Round Down
+        </button>
+      </div>
+
+      <!-- Round mode indicator -->
+      <p id="round-note" class="text-center text-emerald-100 text-xs mt-2 h-4"></p>
+    </section>
+
+    <!-- ─── Reset ─── -->
+    <button id="reset-btn" class="action-btn w-full py-4 rounded-2xl border-2 border-slate-200 text-slate-500 font-semibold text-base hover:border-red-300 hover:text-red-400 hover:bg-red-50 bg-white card">
+      🔄 Reset Calculator
+    </button>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ADSENSE PLACEHOLDER — Below calculator
+         Replace the comment below with your actual AdSense unit code.
+         ══════════════════════════════════════════════════════════════
+    <!--
+    <div class="w-full flex justify-center py-2">
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+           data-ad-slot="YYYYYYYYYY"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+    -->
+
+    <!-- ─── Affiliate Section ─── -->
+    <section class="bg-white rounded-2xl p-5 card">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="font-bold text-slate-700 text-base">💳 Best Cards for Dining &amp; Travel</h3>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">Earn cash back on every restaurant visit. <em>Affiliate links — we may earn a commission at no cost to you.</em></p>
+      <div class="space-y-3">
+        <!-- Chase Sapphire -->
+        <a href="#chase-sapphire-affiliate-link" class="affiliate-card flex items-center gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 no-underline block card" rel="noopener sponsored" target="_blank">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0">C</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-slate-800 text-sm">Chase Sapphire Preferred®</p>
+            <p class="text-xs text-slate-500">3x on dining · 60,000 bonus points offer</p>
+          </div>
+          <span class="text-emerald-500 font-bold text-xs flex-shrink-0">Apply →</span>
+        </a>
+        <!-- Amex Gold -->
+        <a href="#amex-gold-affiliate-link" class="affiliate-card flex items-center gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 no-underline block card" rel="noopener sponsored" target="_blank">
+          <div class="w-10 h-10 rounded-lg bg-yellow-500 flex items-center justify-center text-white font-black text-sm flex-shrink-0">A</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-slate-800 text-sm">American Express® Gold Card</p>
+            <p class="text-xs text-slate-500">4x at restaurants · $120 dining credit</p>
+          </div>
+          <span class="text-emerald-500 font-bold text-xs flex-shrink-0">Apply →</span>
+        </a>
+        <!-- Capital One Savor -->
+        <a href="#capital-one-savor-affiliate-link" class="affiliate-card flex items-center gap-4 bg-slate-50 rounded-xl p-4 border border-slate-100 no-underline block card" rel="noopener sponsored" target="_blank">
+          <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center text-white font-black text-sm flex-shrink-0">V</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-slate-800 text-sm">Capital One Savor Cash Rewards</p>
+            <p class="text-xs text-slate-500">3% cash back on dining & entertainment</p>
+          </div>
+          <span class="text-emerald-500 font-bold text-xs flex-shrink-0">Apply →</span>
+        </a>
+      </div>
+      <p class="text-xs text-slate-300 mt-3 text-center">Affiliate links — see our <a href="#disclosure" class="underline text-slate-400">full disclosure</a></p>
+    </section>
+
+    <!-- ─── Footer ─── -->
+    <footer class="text-center text-xs text-slate-400 pb-8 space-y-1">
+      <p>© 2026 QuickTipCalc.com — Free tip calculator, no signup required.</p>
+      <p><a href="#privacy" class="underline">Privacy</a> · <a href="#terms" class="underline">Terms</a> · <a href="#disclosure" class="underline">Affiliate Disclosure</a></p>
+    </footer>
+
+  </main>
+
+  <!-- ══════════ JAVASCRIPT ══════════ -->
+  <script>
+    // ─── State ───────────────────────────────────────────────────
+    const state = {
+      bill: 0,
+      tipPct: 20,
+      people: 1,
+      roundMode: null, // 'up' | 'down' | null
+    };
+
+    // ─── DOM references ──────────────────────────────────────────
+    const $bill         = document.getElementById('bill-amount');
+    const $customTip    = document.getElementById('custom-tip');
+    const $tipSlider    = document.getElementById('tip-slider');
+    const $sliderLabel  = document.getElementById('slider-label');
+    const $peopleCount  = document.getElementById('people-count');
+    const $peopleLabel  = document.getElementById('people-label');
+    const $peopleInput  = document.getElementById('people-input');
+    const $peopleDec    = document.getElementById('people-dec');
+    const $peopleInc    = document.getElementById('people-inc');
+    const $tipBadge     = document.getElementById('tip-badge');
+    const $tipAmount    = document.getElementById('tip-amount');
+    const $tipPerPerson = document.getElementById('tip-per-person');
+    const $totalPerPerson = document.getElementById('total-per-person');
+    const $totalBill    = document.getElementById('total-bill');
+    const $roundUp      = document.getElementById('round-up-btn');
+    const $roundDown    = document.getElementById('round-down-btn');
+    const $roundNote    = document.getElementById('round-note');
+    const $reset        = document.getElementById('reset-btn');
+    const tipBtns       = document.querySelectorAll('.tip-btn');
+
+    // ─── Helpers ─────────────────────────────────────────────────
+    function fmt(n) {
+      return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    function clamp(val, min, max) {
+      return Math.min(Math.max(val, min), max);
+    }
+
+    // ─── Calculate & Render ──────────────────────────────────────
+    function calculate() {
+      const bill   = state.bill;
+      const pct    = state.tipPct / 100;
+      const people = state.people;
+
+      const tipAmount    = bill * pct;
+      const totalBill    = bill + tipAmount;
+      let   totalPP      = totalBill / people;
+      const tipPP        = tipAmount / people;
+
+      // Apply rounding to per-person total
+      if (state.roundMode === 'up') {
+        totalPP = Math.ceil(totalPP);
+      } else if (state.roundMode === 'down') {
+        totalPP = Math.floor(totalPP);
+      }
+
+      // Render
+      flashUpdate($tipAmount,     fmt(tipAmount));
+      flashUpdate($tipPerPerson,  fmt(tipPP));
+      flashUpdate($totalPerPerson, fmt(totalPP));
+      flashUpdate($totalBill,     fmt(totalBill));
+      $tipBadge.textContent = state.tipPct + '% tip';
+    }
+
+    // Flash animation on value change
+    function flashUpdate($el, value) {
+      if ($el.textContent === value) return;
+      $el.classList.add('updating');
+      requestAnimationFrame(() => {
+        $el.textContent = value;
+        $el.classList.remove('updating');
+      });
+    }
+
+    // ─── Tip preset buttons ──────────────────────────────────────
+    function setTipPct(pct, source) {
+      state.tipPct = pct;
+      state.roundMode = null;
+      $roundNote.textContent = '';
+
+      // Update preset button styles
+      tipBtns.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.tip) === pct);
+      });
+
+      // Sync slider and custom input (if source isn't that element)
+      if (source !== 'slider') {
+        $tipSlider.value = clamp(pct, 0, 50);
+        $sliderLabel.textContent = pct + '%';
+      }
+      if (source !== 'custom') {
+        $customTip.value = '';
+      }
+
+      calculate();
+    }
+
+    tipBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pct = parseInt(btn.dataset.tip);
+        $customTip.value = '';
+        setTipPct(pct, 'preset');
+      });
+    });
+
+    // ─── Custom tip input ────────────────────────────────────────
+    $customTip.addEventListener('input', () => {
+      const val = parseFloat($customTip.value);
+      if (!isNaN(val) && val >= 0) {
+        // Deselect preset buttons
+        tipBtns.forEach(btn => btn.classList.remove('active'));
+        state.tipPct = val;
+        state.roundMode = null;
+        $roundNote.textContent = '';
+        $tipSlider.value = clamp(val, 0, 50);
+        $sliderLabel.textContent = val + '%';
+        calculate();
+      }
+    });
+
+    // ─── Slider ──────────────────────────────────────────────────
+    $tipSlider.addEventListener('input', () => {
+      const val = parseInt($tipSlider.value);
+      $sliderLabel.textContent = val + '%';
+      state.tipPct = val;
+      state.roundMode = null;
+      $roundNote.textContent = '';
+
+      // Update preset buttons
+      const matchBtn = [...tipBtns].find(b => parseInt(b.dataset.tip) === val);
+      tipBtns.forEach(btn => btn.classList.remove('active'));
+      if (matchBtn) matchBtn.classList.add('active');
+
+      $customTip.value = val;
+      calculate();
+    });
+
+    // ─── Bill amount ─────────────────────────────────────────────
+    $bill.addEventListener('input', () => {
+      const val = parseFloat($bill.value);
+      state.bill = isNaN(val) ? 0 : Math.max(0, val);
+      state.roundMode = null;
+      $roundNote.textContent = '';
+      calculate();
+    });
+
+    // ─── People controls ─────────────────────────────────────────
+    function setPeople(n) {
+      n = clamp(Math.round(n), 1, 20);
+      state.people = n;
+      $peopleCount.textContent = n;
+      $peopleLabel.textContent = n === 1 ? 'person' : 'people';
+      $peopleInput.value = n;
+      state.roundMode = null;
+      $roundNote.textContent = '';
+      calculate();
+    }
+
+    $peopleDec.addEventListener('click', () => setPeople(state.people - 1));
+    $peopleInc.addEventListener('click', () => setPeople(state.people + 1));
+
+    $peopleInput.addEventListener('input', () => {
+      const val = parseInt($peopleInput.value);
+      if (!isNaN(val) && val >= 1) setPeople(val);
+    });
+
+    // ─── Round Up / Round Down ───────────────────────────────────
+    $roundUp.addEventListener('click', () => {
+      if (state.roundMode === 'up') {
+        state.roundMode = null;
+        $roundNote.textContent = '';
+        $roundUp.classList.remove('bg-white/40');
+        $roundDown.classList.remove('bg-white/40');
+      } else {
+        state.roundMode = 'up';
+        $roundNote.textContent = '⬆️ Rounded up to nearest dollar per person';
+        $roundUp.classList.add('bg-white/40');
+        $roundDown.classList.remove('bg-white/40');
+      }
+      calculate();
+    });
+
+    $roundDown.addEventListener('click', () => {
+      if (state.roundMode === 'down') {
+        state.roundMode = null;
+        $roundNote.textContent = '';
+        $roundUp.classList.remove('bg-white/40');
+        $roundDown.classList.remove('bg-white/40');
+      } else {
+        state.roundMode = 'down';
+        $roundNote.textContent = '⬇️ Rounded down to nearest dollar per person';
+        $roundDown.classList.add('bg-white/40');
+        $roundUp.classList.remove('bg-white/40');
+      }
+      calculate();
+    });
+
+    // ─── Reset ───────────────────────────────────────────────────
+    $reset.addEventListener('click', () => {
+      // Reset state
+      state.bill = 0;
+      state.tipPct = 20;
+      state.people = 1;
+      state.roundMode = null;
+
+      // Reset inputs
+      $bill.value = '';
+      $customTip.value = '';
+      $tipSlider.value = 20;
+      $sliderLabel.textContent = '20%';
+      $peopleInput.value = 1;
+
+      // Reset people display
+      $peopleCount.textContent = '1';
+      $peopleLabel.textContent = 'person';
+
+      // Reset preset buttons — 20% default
+      tipBtns.forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.tip) === 20);
+      });
+
+      // Reset round buttons
+      $roundUp.classList.remove('bg-white/40');
+      $roundDown.classList.remove('bg-white/40');
+      $roundNote.textContent = '';
+
+      calculate();
+
+      // Animate bill field focus
+      $bill.focus();
+    });
+
+    // ─── Init ────────────────────────────────────────────────────
+    calculate();
+  </script>
+
+</body>
+</html>
