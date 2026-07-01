@@ -1,0 +1,28 @@
+# Tip Calculator — quicktipcalc.cc
+
+## What This Tool Does
+Free tip calculator. Instantly calculate restaurant tips, split bills with friends, and choose your tip percentage. No signup required.
+
+## URL
+https://quicktipcalc.cc
+
+## Keywords
+tip calculator, restaurant tip, bill splitter, tip percentage
+
+## Frequently Asked Questions
+Q: How much should I tip at a restaurant?
+A: The standard tip at a restaurant is 15-20% of the pre-tax bill. For excellent service, 20-25% is appreciated. For average service, 15% is acceptable.
+Q: What is a 20% tip on $50?
+A: A 20% tip on a $50 bill is $10, making your total $60. Use our tip calculator to instantly calculate any tip percentage on any bill amount.
+Q: How do I split a bill evenly?
+A: Enter your total bill amount, select your tip percentage, then enter the number of people splitting the bill. The calculator will show each person's share including tip.
+Q: Should I tip on the pre-tax or post-tax amount?
+A: Most etiquette experts recommend tipping on the pre-tax amount, though tipping on the total is also common. Our calculator lets you input either amount.
+Q: What is a good tip for delivery?
+A: A standard tip for food delivery is 15-20% of the order total, or a minimum of $3-5 for small orders.
+
+## Disclaimer
+This tool is for informational purposes only. Results are estimates and should not replace professional advice.
+
+## Data Privacy
+All calculations are performed client-side in the user's browser. No personal data is collected or transmitted.
